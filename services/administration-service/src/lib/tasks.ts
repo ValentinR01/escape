@@ -1,6 +1,7 @@
 import { logger } from "../helpers/logger";
 import { prisma } from "../helpers/prisma";
 import type { Task } from "@prisma/client";
+import {sendMessage} from "../helpers/kafka";
 
 export const getTasks = async (userId : string): Promise<Task[]> => {
   try {
@@ -25,5 +26,7 @@ export const createTask = async (userId: string, title: string, content: string)
         userId,
       },
     });
+    const kafkaMessage = { "taskId": task.id, "userId": task.userId};
+    sendMessage("task.created", kafkaMessage);
     return task;
 };
