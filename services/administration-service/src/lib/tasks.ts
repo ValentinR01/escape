@@ -15,3 +15,15 @@ export const getTasks = async (userId : string): Promise<Task[]> => {
     throw error;
   }
 };
+
+export const createTask = async (userId: string, title: string, content: string): Promise<Task> => {
+    const task = await prisma.task.create({
+      data: {
+        title,
+        content,
+        status: "PENDING",
+        userId,
+      },
+    });
+    return task;
+};
