@@ -1,97 +1,35 @@
-# Tasky
 
-## Requirements
+# Technical Test
 
-- Python 3.12 with `pip`, `setuptools`
-- Node.js 20 with `npm`
-- Docker 2.0 with `docker-compose`
+A brief description of this test 
 
-## Installation
+## Init 
+I struggled with Prisma container openssl dependence issue. I tried to reinstall the package installed on the Dockerfile and tried to specify other openssl version on schema. Prisma but without success. I Finally thought it might be related to a new alpine release, so I rollbac
 
-```bash
-make install
-```
 
-This command will:
+### 1.1 - Create a task model
+Took some time to refresh on Prisma, but was OK :) 
 
-- Install Node.js dependencies
-- Install Python dependencies
+### 1.2 - Create a task
+I followed the project structure and created new libs and routes files.
 
-## Development
+### 1.3 - List the tasks of the authenticated user
+Was easy because the auth Middleware was already implemented 
 
-- The development environment is based on Docker containers. The `docker-compose.yml` file describes the services and their dependencies.
-- Docker containers are started with live-reload capabilities. Unless dependencies changed, there is no need to restart the containers.
+### 1.4 - Publish a message on the broker when a task is created
+Was easy because the Kafka Service was already created 
 
-```bash
-make start
-```
+## Exercice 2: Have the tasks service handling tasks
 
-## Services
+### 2.1 - Listen on the `task.created` topic
+I tried to find a way to run concurrently both consumer's runner. Spent way too much time on it for no result. I ended up switching from one asyncio consumer to another.
 
-Tasky is made of 2 services:
+### 2.2 - Publish a message on the broker when a task's status changes
+As for the Node.js part, the Kafka Class and producer method was already implemented, it wasn't too difficult. 
 
-- `administration`: A Node.js REST API, based on [express](https://expressjs.com) used to store users and tasks within a PostgreSQL database, and to manage authentication. It leverages the [Prisma](https://prisma.io) ORM. It can interact with Kafka through the [KafkaJs](https://kafka.js.org/) library.
-- `tasks` A Python service composed of Kafka consumers and producers built on [confluent_kafka](https://github.com/confluentinc/confluent-kafka-python).
+### 2.3: Make sure many tasks can be handled simultaneously
+No time left :/ 
 
-Both services can post and listen message from a [Redpanda](https://redpanda.com/) (~Kafka) message broker.
 
-## Interfaces
-
-- The `administration` service exposes a REST API on [localhost:2602](http://localhost:2602)
-- The `tasks` listens on the Redpanda broker
-- The Redpanda broker exposes a web interface on [localhost:15671](http://localhost:15671)
-- The Postgres database can be accessed from [localhost:5432](localhost:5432)
-
-## Usage and helpers
-
-You can rely on the [Makefile](./Makefile) to run several lifecycle commands:
-
-- migrate the database: `make migrate`
-- reset the database: `make migrate-reset`
-- check typing and the code quality: `make check`
-- generate the requirements file for the Python service: `make freeze`
-
-You can also rely on bash scripts to interact with the services. Most of the time, these scripts do nothing more than a cURL.
-
-- `./scripts/create-user.sh` to create a user
-- `./scripts/get-me.sh` to fetch the authenticated user
-
-## How tos
-
-### How to add or update a model in the database
-
-- The database is managed through [Prisma](https://prisma.io), a Node.js ORM. To add or update a model, you need to edit the `services/administration/prisma/schema.prisma` file, then run a database migration:
-
-```bash
-make migrate
-```
-
-- Database credentials and parameters are defined in the docker-compose.yml file for docker environements and in the [.env](./services/administration-service/.env) file for local development.
-
-### How to send a message to the message broker
-
-#### Node.js example
-
-- See `createUser` in [services/administration-service/src/lib/users.ts](./services/administration-service/src/lib/users.ts)
-- Browse the redpanda console on [localhost:15671](localhost:15671) -> `Topics` -> `<topic name>`
-
-#### Python example
-
-You can import the producer from `tasks.kafka` service, then call `send_json` on it to publish a message to the given topic.
-
-```python
-from tasks.kafka import producer
-producer.send_json("topic_name", {"foo": "bar"})
-```
-
-- Browse the redpanda console on [localhost:15671](localhost:15671) -> `Topics` -> `<topic name>`
-
-### How to consume a message from the message broker
-
-#### Node.js example
-
-- This one is up to you ;)
-
-#### Python example
-
-You can import the function `consume` from `tasks.kafka` service, then it to consume messages from the given topic. An example can be found in [services/tasks-services/tasks/main.py](./services/tasks-service/tasks/main.py)
+## Overall 
+I thought this test was more about the underlying Kafka Infrastructure / Dockerization / Infra than development. I tried to be ready for it with Kafka compose stack, Avro Schemas, Kafka security etc
