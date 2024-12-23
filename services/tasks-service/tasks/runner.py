@@ -27,3 +27,7 @@ async def handle_user_created(msg: Message) -> None:
     except ValidationError as e:
         logger.error(e, exc_info=True)
         return
+
+
+
+

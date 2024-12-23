@@ -26,7 +26,7 @@ export const createTask = async (userId: string, title: string, content: string)
         userId,
       },
     });
-    const kafkaMessage = { "taskId": task.id, "userId": task.userId};
+    const kafkaMessage = { "id": task.id, "userId": task.userId};
     sendMessage("task.created", kafkaMessage);
     return task;
 };
