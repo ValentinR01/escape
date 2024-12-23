@@ -1,6 +1,7 @@
 import express from "express";
 import { logger } from "./helpers/logger";
 import { usersRouter } from "./routes/users";
+import { tasksRouter} from "./routes/tasks";
 import { z } from "zod";
 import { AuthenticationError, ValidationError } from "./helpers/errors";
 
@@ -16,6 +17,7 @@ server.use((req, _res, next) => {
 
 // Users routes, see routes/users.ts
 server.use("/users", usersRouter);
+server.use("/tasks", tasksRouter);
 
 // 404 handler
 server.all("*", (_req, res) => {
